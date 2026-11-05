@@ -1,0 +1,11 @@
+
+# Python & Backend Secrets
+venv/
+backend/venv/
+__pycache__/
+*.pyc
+.env
+backend/.env
+*.db
+.DS_Store
+.idea/
