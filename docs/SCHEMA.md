@@ -1,9 +1,7 @@
 # ecommerce-store — Database Schema & Data Modelling (Day 2)
 
 ## 1. Entity-Relationship (ER) Diagram
-GitHub automatically renders the Mermaid ER diagram below showing our 6 core relational tables and foreign-key constraints:
 
-```mermaid
 erDiagram
     USERS ||--o{ CART_ITEMS : "maintains"
     USERS ||--o{ ORDERS : "places"
@@ -62,3 +60,8 @@ erDiagram
         int quantity "Quantity Purchased"
         decimal unit_price "Price Snapshot at Purchase Time"
     }
+
+## 2. Key Relational Design Decisions
+1. **Price Snapshot in `ORDER_ITEMS`:** Storing `unit_price` on `ORDER_ITEMS` ensures historical order totals remain accurate even if an Admin later changes a product's price in `PRODUCTS`.
+2. **Persistent Cart (`CART_ITEMS`):** Linked directly to `user_id` so the user's cart survives app restarts or device switches.
+3. **Payment Verification State (`ORDERS`):** Orders start as `PENDING` when initialized and only transition to `PAID` (with stock deduction) after Razorpay signature verification succeeds on Days 11–12.
