@@ -9,6 +9,8 @@ from database import engine, Base, get_db
 from models import User
 from schemas import UserCreate, UserResponse
 from auth import hash_password
+from schemas import UserCreate, UserResponse, UserLogin, Token, CategoryCreate, CategoryResponse
+from models import User, Category, Product
 
 Base.metadata.create_all(bind=engine)
 
@@ -74,3 +76,18 @@ def login(credentials: UserLogin, db: Session = Depends(get_db)):
 
     access_token = create_access_token(data={"sub": user.email, "role": user.role})
     return {"access_token": access_token, "token_type": "bearer"}
+@app.post("/api/categories", response_model=CategoryResponse, status_code=status.HTTP_201_CREATED)
+def create_category(category_data: CategoryCreate, db: Session = Depends(get_db)):
+    existing = db.query(Category).filter(Category.name == category_data.name).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Category already exists")
+
+    new_category = Category(name=category_data.name, description=category_data.description)
+    db.add(new_category)
+    db.commit()
+    db.refresh(new_category)
+    return new_category
+
+@app.get("/api/categories", response_model=list[CategoryResponse])
+def get_categories(db: Session = Depends(get_db)):
+    return db.query(Category).all()

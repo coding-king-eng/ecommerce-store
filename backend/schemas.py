@@ -23,3 +23,14 @@ class UserLogin(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+class CategoryCreate(BaseModel):
+    name: str
+    description: str | None = None
+
+class CategoryResponse(BaseModel):
+    id: int
+    name: str
+    description: str | None = None
+
+class Config:
+    orm_mode = True
