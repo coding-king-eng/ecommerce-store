@@ -14,5 +14,12 @@ class UserResponse(BaseModel):
     role: str
     created_at: datetime
 
-    class Config:
+class Config:
         from_attributes = True
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
