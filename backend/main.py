@@ -112,5 +112,19 @@ def create_product(product_data: ProductCreate, db: Session = Depends(get_db)):
     return new_product
 
 @app.get("/api/products", response_model=list[ProductResponse])
-def get_products(db: Session = Depends(get_db)):
-    return db.query(Product).all()
+def get_products(
+    category_id: int | None = None,
+    search: str | None = None,
+    db: Session = Depends(get_db)
+):
+    query = db.query(Product)
+
+    # Filter by category if provided
+    if category_id:
+        query = query.filter(Product.category_id == category_id)
+
+    # Search by product name (case-insensitive) if provided
+    if search:
+        query = query.filter(Product.name.ilike(f"%{search}%"))
+
+    return query.all()
