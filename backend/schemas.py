@@ -14,7 +14,7 @@ class UserResponse(BaseModel):
     role: str
     created_at: datetime
 
-class Config:
+    class Config:
         from_attributes = True
 class UserLogin(BaseModel):
     email: EmailStr
@@ -32,5 +32,22 @@ class CategoryResponse(BaseModel):
     name: str
     description: str | None = None
 
-class Config:
-    orm_mode = True
+    class Config:
+        orm_mode = True
+class ProductCreate(BaseModel):
+    name: str
+    description: str | None = None
+    price: float
+    stock: int = 0
+    category_id: int
+
+class ProductResponse(BaseModel):
+    id: int
+    name: str
+    description: str | None = None
+    price: float
+    stock: int
+    category_id: int
+
+    class Config:
+        orm_mode = True

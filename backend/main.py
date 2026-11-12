@@ -11,6 +11,7 @@ from schemas import UserCreate, UserResponse
 from auth import hash_password
 from schemas import UserCreate, UserResponse, UserLogin, Token, CategoryCreate, CategoryResponse
 from models import User, Category, Product
+from schemas import UserCreate, UserResponse, UserLogin, Token, CategoryCreate, CategoryResponse, ProductCreate, ProductResponse
 
 Base.metadata.create_all(bind=engine)
 
@@ -91,3 +92,25 @@ def create_category(category_data: CategoryCreate, db: Session = Depends(get_db)
 @app.get("/api/categories", response_model=list[CategoryResponse])
 def get_categories(db: Session = Depends(get_db)):
     return db.query(Category).all()
+@app.post("/api/products", response_model=ProductResponse, status_code=status.HTTP_201_CREATED)
+def create_product(product_data: ProductCreate, db: Session = Depends(get_db)):
+    # Verify category exists
+    category = db.query(Category).filter(Category.id == product_data.category_id).first()
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+
+    new_product = Product(
+        name=product_data.name,
+        description=product_data.description,
+        price=product_data.price,
+        stock=product_data.stock,
+        category_id=product_data.category_id
+    )
+    db.add(new_product)
+    db.commit()
+    db.refresh(new_product)
+    return new_product
+
+@app.get("/api/products", response_model=list[ProductResponse])
+def get_products(db: Session = Depends(get_db)):
+    return db.query(Product).all()
