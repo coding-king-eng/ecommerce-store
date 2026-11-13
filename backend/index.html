@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZapKart ⚡ | Superfast Tech & Daily Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f19; color: #f1f5f9; }
+        .glass { background: rgba(17, 24, 39, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .card-glow:hover { box-shadow: 0 12px 30px -10px rgba(99, 102, 241, 0.35); transform: translateY(-4px); }
+        .gradient-text { background: linear-gradient(135deg, #38bdf8, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .gradient-btn { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+        .gradient-btn:hover { background: linear-gradient(135deg, #4f46e5, #7c3aed); }
+    </style>
+</head>
+<body class="min-h-screen selection:bg-indigo-500 selection:text-white">
+
+<!-- Top Glass Navbar -->
+<nav class="glass sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-20 items-center">
+            <!-- Unique Brand Identity -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="navigate('store')">
+                <div class="w-11 h-11 rounded-2xl gradient-btn flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-bolt text-white text-xl"></i>
+                </div>
+                <div>
+                    <span class="text-2xl font-extrabold tracking-tight text-white">Zap<span class="gradient-text">Kart</span></span>
+                    <span class="block text-[10px] uppercase tracking-widest text-indigo-400 font-bold">⚡ 12-Min Campus Drop</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center space-x-2.5 sm:space-x-3">
+                <button onclick="navigate('store')" class="px-3.5 py-2 rounded-xl text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-800/70 transition">
+                    <i class="fa-solid fa-compass mr-1.5 text-indigo-400"></i>Explore
+                </button>
+                <button onclick="openProductModal()" class="gradient-btn text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-indigo-500/25 transition flex items-center">
+                    <i class="fa-solid fa-plus mr-1.5"></i> Add Product
+                </button>
+                <button onclick="openCategoryModal()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition hidden sm:inline-flex items-center">
+                    <i class="fa-solid fa-layer-group mr-1.5 text-sky-400"></i> + Category
+                </button>
+                <button id="nav-auth-btn" onclick="navigate('auth')" class="bg-slate-900 border border-slate-700 hover:border-indigo-500 px-4 py-2.5 rounded-xl text-sm font-semibold transition flex items-center">
+                    <i class="fa-regular fa-circle-user mr-1.5 text-purple-400"></i>
+                    <span id="auth-btn-text">Login</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Toast Notification (Day 10 UX) -->
+<div id="toast" class="fixed bottom-6 right-6 hidden z-50 px-5 py-3.5 rounded-2xl shadow-2xl text-white font-bold text-sm transition-all"></div>
+
+<!-- Main Content -->
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- ================= DAY 8: AUTH SCREEN ================= -->
+    <section id="view-auth" class="hidden max-w-md mx-auto glass p-8 rounded-3xl shadow-2xl mt-6">
+        <div class="text-center mb-6">
+            <h2 class="text-2xl font-extrabold text-white">Welcome to ZapKart ⚡</h2>
+            <p class="text-xs text-slate-400 mt-1">Sign in or create an account to manage products</p>
+        </div>
+
+        <div class="flex bg-slate-900/90 p-1 rounded-2xl mb-6 border border-slate-800">
+            <button id="tab-login" onclick="switchAuthTab('login')" class="w-1/2 py-2.5 rounded-xl text-sm font-bold gradient-btn text-white shadow">Login</button>
+            <button id="tab-signup" onclick="switchAuthTab('signup')" class="w-1/2 py-2.5 rounded-xl text-sm font-bold text-slate-400">Sign Up</button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Email Address</label>
+                <input type="email" id="login-email" required placeholder="shorya@zapkart.com" class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700 rounded-xl text-white focus:border-indigo-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Password</label>
+                <input type="password" id="login-password" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700 rounded-xl text-white focus:border-indigo-500 outline-none">
+            </div>
+            <button type="submit" id="btn-login-submit" class="w-full gradient-btn text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-500/30 transition">
+                Sign In Now
+            </button>
+        </form>
+
+        <!-- Signup Form -->
+        <form id="form-signup" onsubmit="handleSignup(event)" class="space-y-4 hidden">
+            <div>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Full Name</label>
+                <input type="text" id="signup-name" required placeholder="Shorya Agrawal" class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700 rounded-xl text-white focus:border-indigo-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Email Address</label>
+                <input type="email" id="signup-email" required placeholder="shorya@zapkart.com" class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700 rounded-xl text-white focus:border-indigo-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Create Password</label>
+                <input type="password" id="signup-password" required placeholder="Minimum 6 characters" class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700 rounded-xl text-white focus:border-indigo-500 outline-none">
+            </div>
+            <button type="submit" id="btn-signup-submit" class="w-full gradient-btn text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-500/30 transition">
+                Create Free Account
+            </button>
+        </form>
+    </section>
+
+    <!-- ================= DAY 9: STOREFRONT SCREEN ================= -->
+    <section id="view-store">
+        <!-- Hero Banner -->
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-900/90 via-purple-900/80 to-slate-900 border border-indigo-500/30 p-7 sm:p-10 mb-8 shadow-2xl">
+            <div class="relative z-10 max-w-2xl">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 mb-3">
+                        ⚡ HYPER-LOCAL TECH & CRAVINGS
+                    </span>
+                <h1 class="text-3xl sm:text-5xl font-extrabold text-white leading-tight">
+                    Next-Gen Shopping, <span class="gradient-text">Delivered in Minutes.</span>
+                </h1>
+                <p class="text-slate-300 mt-3 text-sm sm:text-base">
+                    From flagship gadgets & RGB gaming gear to chilled midnight coffee — powered live by your FastAPI + SQLAlchemy engine.
+                </p>
+            </div>
+            <i class="fa-solid fa-bolt-lightning text-[160px] text-indigo-500/10 absolute -right-4 -bottom-6"></i>
+        </div>
+
+        <!-- Search Bar & Category Filter Pills -->
+        <div class="flex flex-col md:flex-row gap-4 mb-8 items-center justify-between">
+            <div class="relative w-full md:w-96">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400"></i>
+                <input type="text" id="search-input" oninput="loadProducts()" placeholder="Search iPhone, Sony, Keyboard, Coffee..."
+                       class="w-full pl-11 pr-4 py-3 bg-slate-900/90 border border-slate-700/80 rounded-2xl text-sm text-white placeholder-slate-400 focus:border-indigo-500 outline-none shadow-inner">
+            </div>
+
+            <div id="category-Bar" class="flex gap-2.5 overflow-x-auto w-full md:w-auto pb-1">
+                <!-- Dynamic Category Pills -->
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading-spinner" class="text-center py-16 hidden">
+            <i class="fa-solid fa-bolt fa-bounce text-4xl text-indigo-400"></i>
+            <p class="text-slate-400 text-sm mt-3 font-medium">Fetching live inventory from FastAPI...</p>
+        </div>
+
+        <!-- Products Grid -->
+        <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Dynamic Cards -->
+        </div>
+    </section>
+
+    <!-- ================= DAY 9: PRODUCT DETAIL SCREEN ================= -->
+    <section id="view-detail" class="hidden max-w-4xl mx-auto glass rounded-3xl p-6 sm:p-10 mt-4 shadow-2xl">
+        <button onclick="navigate('store')" class="text-sm font-semibold text-indigo-400 hover:text-indigo-300 mb-6 inline-flex items-center">
+            <i class="fa-solid fa-arrow-left mr-2"></i> Back to Storefront
+        </button>
+        <div id="detail-content"></div>
+    </section>
+
+</main>
+
+<!-- ================= DAY 10: ADD / EDIT PRODUCT MODAL ================= -->
+<div id="product-modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="glass rounded-3xl max-w-md w-full p-7 shadow-2xl border border-slate-700">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-4 mb-5">
+            <h3 id="modal-title" class="text-xl font-extrabold text-white">Add New Product</h3>
+            <button onclick="closeProductModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+        </div>
+        <form id="form-product" onsubmit="handleSaveProduct(event)" class="space-y-4">
+            <input type="hidden" id="prod-id">
+            <div>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Product Title</label>
+                <input type="text" id="prod-name" required placeholder="e.g., MacBook Air M3 / Monster Energy" class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white outline-none focus:border-indigo-500">
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Image URL (Optional)</label>
+                <input type="url" id="prod-img" placeholder="https://images.unsplash.com/..." class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white outline-none focus:border-indigo-500 text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Description</label>
+                <textarea id="prod-desc" rows="2" placeholder="Highlight key specs or details..." class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white outline-none focus:border-indigo-500 text-sm"></textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Price (₹)</label>
+                    <input type="number" step="0.01" id="prod-price" required placeholder="1999" class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Stock Units</label>
+                    <input type="number" id="prod-stock" required value="15" class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white outline-none focus:border-indigo-500">
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Category</label>
+                <select id="prod-category" required class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white outline-none focus:border-indigo-500"></select>
+            </div>
+            <button type="submit" class="w-full gradient-btn text-white font-bold py-3 rounded-xl shadow-lg transition mt-2">
+                Save to Storefront
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- ================= CREATE CATEGORY MODAL ================= -->
+<div id="category-modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="glass rounded-3xl max-w-sm w-full p-7 shadow-2xl border border-slate-700">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-4 mb-5">
+            <h3 class="text-xl font-extrabold text-white">Create Category</h3>
+            <button onclick="closeCategoryModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+        </div>
+        <form onsubmit="handleSaveCategory(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Category Name</label>
+                <input type="text" id="cat-name" required placeholder="e.g., Audio & Wearables" class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white outline-none focus:border-indigo-500">
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Description</label>
+                <input type="text" id="cat-desc" placeholder="Short category summary" class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white outline-none focus:border-indigo-500">
+            </div>
+            <button type="submit" class="w-full gradient-btn text-white font-bold py-3 rounded-xl shadow-lg transition">
+                Add Category
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const API_BASE = "";
+    const DEFAULT_IMG = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80";
+    let categories = [];
+    let selectedCategoryId = null;
+    let currentUserToken = localStorage.getItem("token") || null;
+
+    function unpackProduct(p) {
+        let desc = p.description || "";
+        let img = DEFAULT_IMG;
+        if (desc.includes("|IMG|")) {
+            const parts = desc.split("|IMG|");
+            desc = parts[0].trim();
+            img = parts[1].trim() || DEFAULT_IMG;
+        }
+        return { ...p, cleanDesc: desc, imageUrl: img };
+    }
+
+    function showToast(msg, isError = false) {
+        const toast = document.getElementById("toast");
+        toast.innerHTML = `<i class="fa-solid ${isError ? 'fa-triangle-exclamation' : 'fa-circle-check'} mr-2"></i>${msg}`;
+        toast.className = `fixed bottom-6 right-6 z-50 px-5 py-3.5 rounded-2xl shadow-2xl text-white font-bold text-sm ${isError ? 'bg-rose-600' : 'bg-emerald-600'}`;
+        toast.classList.remove("hidden");
+        setTimeout(() => toast.classList.add("hidden"), 3200);
+    }
+
+    function navigate(view) {
+        ["store", "auth", "detail"].forEach(v => document.getElementById(`view-${v}`).classList.add("hidden"));
+        document.getElementById(`view-${view}`).classList.remove("hidden");
+        if (view === "store") loadProducts();
+    }
+
+    function switchAuthTab(tab) {
+        const isLogin = tab === 'login';
+        document.getElementById("form-login").classList.toggle("hidden", !isLogin);
+        document.getElementById("form-signup").classList.toggle("hidden", isLogin);
+        document.getElementById("tab-login").className = isLogin ? "w-1/2 py-2.5 rounded-xl text-sm font-bold gradient-btn text-white shadow" : "w-1/2 py-2.5 rounded-xl text-sm font-bold text-slate-400";
+        document.getElementById("tab-signup").className = !isLogin ? "w-1/2 py-2.5 rounded-xl text-sm font-bold gradient-btn text-white shadow" : "w-1/2 py-2.5 rounded-xl text-sm font-bold text-slate-400";
+    }
+
+    async function handleSignup(e) {
+        e.preventDefault();
+        try {
+            const res = await fetch(`${API_BASE}/api/auth/signup`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: document.getElementById("signup-name").value,
+                    email: document.getElementById("signup-email").value,
+                    password: document.getElementById("signup-password").value
+                })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.detail || "Signup failed");
+            showToast("Account created! Please sign in.");
+            switchAuthTab("login");
+        } catch (err) {
+            showToast(err.message, true);
+        }
+    }
+
+    async function handleLogin(e) {
+        e.preventDefault();
+        try {
+            const res = await fetch(`${API_BASE}/api/auth/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email: document.getElementById("login-email").value,
+                    password: document.getElementById("login-password").value
+                })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.detail || "Invalid credentials");
+            localStorage.setItem("token", data.access_token);
+            document.getElementById("auth-btn-text").innerText = "Member ✓";
+            showToast("Welcome back to ZapKart!");
+            navigate("store");
+        } catch (err) {
+            showToast(err.message, true);
+        }
+    }
+
+    async function loadCategories() {
+        const res = await fetch(`${API_BASE}/api/categories`);
+        categories = await res.json();
+
+        const bar = document.getElementById("category-Bar");
+        bar.innerHTML = `<button onclick="filterCategory(null)" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap transition ${selectedCategoryId === null ? 'gradient-btn text-white shadow-lg shadow-indigo-500/30' : 'bg-slate-900 border border-slate-700 text-slate-300 hover:border-indigo-500'}">⚡ All Items</button>`;
+
+        const select = document.getElementById("prod-category");
+        select.innerHTML = "";
+
+        categories.forEach(c => {
+            bar.innerHTML += `<button onclick="filterCategory(${c.id})" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap transition ${selectedCategoryId === c.id ? 'gradient-btn text-white shadow-lg shadow-indigo-500/30' : 'bg-slate-900 border border-slate-700 text-slate-300 hover:border-indigo-500'}">${c.name}</button>`;
+            select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+        });
+    }
+
+    function filterCategory(id) {
+        selectedCategoryId = id;
+        loadCategories();
+        loadProducts();
+    }
+
+    async function loadProducts() {
+        const spinner = document.getElementById("loading-spinner");
+        const grid = document.getElementById("products-grid");
+        spinner.classList.remove("hidden");
+
+        const search = document.getElementById("search-input").value;
+        let url = `${API_BASE}/api/products?`;
+        if (selectedCategoryId) url += `category_id=${selectedCategoryId}&`;
+        if (search) url += `search=${encodeURIComponent(search)}`;
+
+        try {
+            const res = await fetch(url);
+            const rawProducts = await res.json();
+            grid.innerHTML = "";
+
+            if (rawProducts.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-14 glass rounded-3xl"><p class="text-slate-400">No matching products found.</p></div>`;
+                return;
+            }
+
+            rawProducts.forEach(raw => {
+                const p = unpackProduct(raw);
+                const catObj = categories.find(c => c.id === p.category_id);
+                const catName = catObj ? catObj.name : "Store Item";
+                const encodedP = encodeURIComponent(JSON.stringify(p));
+
+                grid.innerHTML += `
+                    <div class="glass rounded-3xl p-4 card-glow transition-all duration-300 flex flex-col justify-between">
+                        <div>
+                            <div onclick="openProductDetail(${p.id})" class="h-48 rounded-2xl overflow-hidden bg-slate-900 mb-4 relative cursor-pointer group">
+                                <img src="${p.imageUrl}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                <span class="absolute top-3 left-3 bg-slate-950/80 backdrop-blur-md text-indigo-300 border border-indigo-500/30 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-lg">${catName}</span>
+                                <span class="absolute bottom-2 right-2 bg-emerald-500/90 text-slate-950 text-[10px] font-extrabold px-2 py-0.5 rounded-md">⚡ 12 MINS</span>
+                            </div>
+                            <h3 onclick="openProductDetail(${p.id})" class="font-extrabold text-white text-base hover:text-indigo-400 cursor-pointer line-clamp-1">${p.name}</h3>
+                            <p class="text-slate-400 text-xs mt-1 line-clamp-2">${p.cleanDesc || 'Premium quality assured.'}</p>
+                        </div>
+                        <div class="mt-5 pt-3.5 border-t border-slate-800/80 flex items-center justify-between">
+                            <div>
+                                <span class="text-xl font-black text-white">₹${p.price.toLocaleString('en-IN')}</span>
+                                <span class="block text-[10px] text-emerald-400 font-bold">${p.stock > 0 ? p.stock + ' units left' : 'Out of Stock'}</span>
+                            </div>
+                            <div class="flex space-x-1.5">
+                                <button onclick="openProductDetail(${p.id})" class="gradient-btn text-white px-3 py-2 rounded-xl text-xs font-bold shadow">View</button>
+                                <button onclick="openEditModal('${encodedP}')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-2 rounded-xl text-xs"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="handleDeleteProduct(${p.id})" class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 px-2.5 py-2 rounded-xl text-xs"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        } catch (err) {
+            showToast("Could not load products", true);
+        } finally {
+            spinner.classList.add("hidden");
+        }
+    }
+
+    async function openProductDetail(id) {
+        try {
+            const res = await fetch(`${API_BASE}/api/products/${id}`);
+            if (!res.ok) throw new Error("Product not found");
+            const p = unpackProduct(await res.json());
+            const catObj = categories.find(c => c.id === p.category_id);
+            const encodedP = encodeURIComponent(JSON.stringify(p));
+
+            document.getElementById("detail-content").innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div class="h-80 rounded-3xl overflow-hidden bg-slate-900 border border-slate-800">
+                        <img src="${p.imageUrl}" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs font-extrabold uppercase px-3 py-1 rounded-full">${catObj ? catObj.name : 'Featured'}</span>
+                        <h2 class="text-3xl font-extrabold text-white mt-3">${p.name}</h2>
+                        <p class="text-slate-300 mt-3 text-sm leading-relaxed">${p.cleanDesc}</p>
+                        <div class="text-4xl font-black text-white mt-5">₹${p.price.toLocaleString('en-IN')}</div>
+                        <p class="text-xs text-emerald-400 font-bold mt-1">⚡ In Stock (${p.stock} units available for instant dispatch)</p>
+                        <div class="mt-7 flex flex-wrap gap-3">
+                            <button onclick="showToast('Added ${p.name} to Express Cart! ⚡')" class="gradient-btn text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg"><i class="fa-solid fa-bag-shopping mr-2"></i>Buy Now</button>
+                            <button onclick="openEditModal('${encodedP}')" class="bg-slate-800 hover:bg-slate-700 text-white px-5 py-3 rounded-xl text-sm font-bold"><i class="fa-solid fa-pen mr-1.5"></i>Edit</button>
+                            <button onclick="handleDeleteProduct(${p.id})" class="bg-rose-600/20 border border-rose-500/40 text-rose-400 px-5 py-3 rounded-xl text-sm font-bold"><i class="fa-solid fa-trash mr-1.5"></i>Delete</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            navigate("detail");
+        } catch (err) {
+            showToast(err.message, true);
+        }
+    }
+
+    function openProductModal() {
+        document.getElementById("modal-title").innerText = "Add New Product";
+        document.getElementById("prod-id").value = "";
+        document.getElementById("form-product").reset();
+        document.getElementById("product-modal").classList.remove("hidden");
+    }
+
+    function openEditModal(encodedP) {
+        const p = JSON.parse(decodeURIComponent(encodedP));
+        document.getElementById("modal-title").innerText = "Edit Product";
+        document.getElementById("prod-id").value = p.id;
+        document.getElementById("prod-name").value = p.name;
+        document.getElementById("prod-desc").value = p.cleanDesc;
+        document.getElementById("prod-img").value = p.imageUrl !== DEFAULT_IMG ? p.imageUrl : "";
+        document.getElementById("prod-price").value = p.price;
+        document.getElementById("prod-stock").value = p.stock;
+        document.getElementById("prod-category").value = p.category_id;
+        document.getElementById("product-modal").classList.remove("hidden");
+    }
+
+    function closeProductModal() {
+        document.getElementById("product-modal").classList.add("hidden");
+    }
+
+    async function handleSaveProduct(e) {
+        e.preventDefault();
+        const id = document.getElementById("prod-id").value;
+        const rawDesc = document.getElementById("prod-desc").value.trim();
+        const rawImg = document.getElementById("prod-img").value.trim() || DEFAULT_IMG;
+        const combinedDesc = `${rawDesc} |IMG|${rawImg}`;
+
+        const payload = {
+            name: document.getElementById("prod-name").value,
+            description: combinedDesc,
+            price: parseFloat(document.getElementById("prod-price").value),
+            stock: parseInt(document.getElementById("prod-stock").value),
+            category_id: parseInt(document.getElementById("prod-category").value)
+        };
+
+        const method = id ? "PUT" : "POST";
+        const url = id ? `${API_BASE}/api/products/${id}` : `${API_BASE}/api/products`;
+
+        try {
+            const res = await fetch(url, {
+                method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.detail || "Failed to save");
+            showToast(id ? "Product updated!" : "New product added to ZapKart!");
+            closeProductModal();
+            navigate("store");
+        } catch (err) {
+            showToast(err.message, true);
+        }
+    }
+
+    async function handleDeleteProduct(id) {
+        if (!confirm("Delete this product from ZapKart?")) return;
+        try {
+            const res = await fetch(`${API_BASE}/api/products/${id}`, { method: "DELETE" });
+            if (!res.ok) throw new Error("Delete failed");
+            showToast("Product removed!");
+            navigate("store");
+        } catch (err) {
+            showToast(err.message, true);
+        }
+    }
+
+    function openCategoryModal() { document.getElementById("category-modal").classList.remove("hidden"); }
+    function closeCategoryModal() { document.getElementById("category-modal").classList.add("hidden"); }
+
+    async function handleSaveCategory(e) {
+        e.preventDefault();
+        try {
+            const res = await fetch(`${API_BASE}/api/categories`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: document.getElementById("cat-name").value,
+                    description: document.getElementById("cat-desc").value
+                })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.detail || "Could not add category");
+            showToast("Category created!");
+            closeCategoryModal();
+            await loadCategories();
+        } catch (err) {
+            showToast(err.message, true);
+        }
+    }
+
+    // Auto-seed demo products on first load & display storefront
+    window.onload = async () => {
+        if (currentUserToken) document.getElementById("auth-btn-text").innerText = "Member ✓";
+        await fetch(`${API_BASE}/api/seed`, { method: "POST" });
+        await loadCategories();
+        await loadProducts();
+    };
+</script>
+</body>
+</html>

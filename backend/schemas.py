@@ -40,6 +40,7 @@ class ProductCreate(BaseModel):
     price: float
     stock: int = 0
     category_id: int
+    image_url: str | None = None
 
 class ProductResponse(BaseModel):
     id: int
@@ -48,6 +49,16 @@ class ProductResponse(BaseModel):
     price: float
     stock: int
     category_id: int
+    image_url: str | None = None
 
     class Config:
+        from_attributes = True
         orm_mode = True
+
+class ProductUpdate(BaseModel):
+    name: str | None = None
+    description: str | None = None
+    price: float | None = None
+    stock: int | None = None
+    category_id: int | None = None
+    image_url: str | None = None
