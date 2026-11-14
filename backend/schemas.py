@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
+from pydantic import BaseModel, EmailStr, Field
 
 class UserCreate(BaseModel):
     name: str = Field(..., min_length=2, max_length=50)
@@ -35,11 +36,11 @@ class CategoryResponse(BaseModel):
     class Config:
         orm_mode = True
 class ProductCreate(BaseModel):
-    name: str
+    name: str = Field(..., min_length=2, max_length=120)
     description: str | None = None
-    price: float
-    stock: int = 0
-    category_id: int
+    price: float = Field(..., gt=0, description="Price must be greater than 0")
+    stock: int = Field(default=0, ge=0, description="Stock cannot be negative")
+    category_id: int = Field(..., gt=0)
     image_url: str | None = None
 
 class ProductResponse(BaseModel):
@@ -56,16 +57,16 @@ class ProductResponse(BaseModel):
         orm_mode = True
 
 class ProductUpdate(BaseModel):
-    name: str | None = None
+    name: str | None = Field(default=None, min_length=2, max_length=120)
     description: str | None = None
-    price: float | None = None
-    stock: int | None = None
-    category_id: int | None = None
+    price: float | None = Field(default=None, gt=0)
+    stock: int | None = Field(default=None, ge=0)
+    category_id: int | None = Field(default=None, gt=0)
     image_url: str | None = None
-class CartItemCreate(BaseModel):
-    product_id: int
-    quantity: int = 1
 
+class CartItemCreate(BaseModel):
+    product_id: int = Field(..., gt=0)
+    quantity: int = Field(default=1, gt=0, le=50)
 class CartItemResponse(BaseModel):
     id: int
     product_id: int
