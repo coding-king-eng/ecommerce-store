@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f19; color: #f1f5f9; }
-        .glass { background: rgba(17, 24, 39, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .glass { background: rgba(17, 24, 39, 0.82); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .card-glow:hover { box-shadow: 0 12px 30px -10px rgba(99, 102, 241, 0.35); transform: translateY(-4px); }
         .gradient-text { background: linear-gradient(135deg, #38bdf8, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .gradient-btn { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
@@ -19,7 +19,7 @@
 <body class="min-h-screen selection:bg-indigo-500 selection:text-white">
 
 <!-- Top Glass Navbar -->
-<nav class="glass sticky top-0 z-50">
+<nav class="glass sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-20 items-center">
             <!-- Unique Brand Identity -->
@@ -34,44 +34,95 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex items-center space-x-2.5 sm:space-x-3">
-                <button onclick="navigate('store')" class="px-3.5 py-2 rounded-xl text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-800/70 transition">
-                    <i class="fa-solid fa-compass mr-1.5 text-indigo-400"></i>Explore
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <button onclick="navigate('store')" class="px-3 py-2 rounded-xl text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-800/70 transition">
+                    <i class="fa-solid fa-compass mr-1 text-indigo-400"></i><span class="hidden md:inline">Explore</span>
                 </button>
-                <button onclick="openProductModal()" class="gradient-btn text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-indigo-500/25 transition flex items-center">
-                    <i class="fa-solid fa-plus mr-1.5"></i> Add Product
+                <button onclick="navigate('orders')" class="px-3 py-2 rounded-xl text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-800/70 transition">
+                    <i class="fa-solid fa-receipt mr-1 text-emerald-400"></i><span class="hidden md:inline">Orders</span>
                 </button>
-                <button onclick="openCategoryModal()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition hidden sm:inline-flex items-center">
+                <button onclick="openProductModal()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center">
+                    <i class="fa-solid fa-plus mr-1.5 text-indigo-400"></i> <span class="hidden sm:inline">Add Item</span>
+                </button>
+                <button onclick="openCategoryModal()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition hidden lg:inline-flex items-center">
                     <i class="fa-solid fa-layer-group mr-1.5 text-sky-400"></i> + Category
                 </button>
-                <button id="nav-auth-btn" onclick="navigate('auth')" class="bg-slate-900 border border-slate-700 hover:border-indigo-500 px-4 py-2.5 rounded-xl text-sm font-semibold transition flex items-center">
-                    <i class="fa-regular fa-circle-user mr-1.5 text-purple-400"></i>
-                    <span id="auth-btn-text">Login</span>
+                <!-- Live Shopping Cart Button -->
+                <button onclick="toggleCartDrawer(true)" class="gradient-btn text-white px-4 py-2.5 rounded-xl text-sm font-extrabold shadow-lg shadow-indigo-500/30 transition flex items-center relative">
+                    <i class="fa-solid fa-cart-shopping mr-2"></i>
+                    <span>Cart</span>
+                    <span id="cart-badge" class="ml-2 bg-white text-indigo-950 text-xs font-black px-2 py-0.5 rounded-full">0</span>
+                </button>
+                <button id="nav-auth-btn" onclick="navigate('auth')" class="bg-slate-900 border border-slate-700 hover:border-indigo-500 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition flex items-center">
+                    <i class="fa-regular fa-circle-user text-purple-400"></i>
+                    <span id="auth-btn-text" class="ml-1.5 hidden md:inline">Login</span>
                 </button>
             </div>
         </div>
     </div>
 </nav>
 
-<!-- Toast Notification (Day 10 UX) -->
+<!-- Toast Notification -->
 <div id="toast" class="fixed bottom-6 right-6 hidden z-50 px-5 py-3.5 rounded-2xl shadow-2xl text-white font-bold text-sm transition-all"></div>
+
+<!-- ================= DAY 12: SLIDE-OVER CART & CHECKOUT DRAWER ================= -->
+<div id="cart-overlay" onclick="toggleCartDrawer(false)" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden z-50"></div>
+<aside id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-slate-950 border-l border-slate-800 z-50 transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
+    <!-- Drawer Header -->
+    <div class="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/60">
+        <div class="flex items-center space-x-2.5">
+            <i class="fa-solid fa-bolt text-yellow-400 text-lg"></i>
+            <h2 class="text-xl font-extrabold text-white">Your Express Cart</h2>
+        </div>
+        <button onclick="toggleCartDrawer(false)" class="text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800/70">
+            <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+    </div>
+
+    <!-- Cart Items List -->
+    <div id="cart-items-container" class="flex-1 overflow-y-auto p-6 space-y-4">
+        <!-- Dynamic Cart Items -->
+    </div>
+
+    <!-- Checkout Section -->
+    <div id="checkout-box" class="p-6 border-t border-slate-800 bg-slate-900/90 space-y-4">
+        <div class="flex justify-between items-center text-sm text-slate-400">
+            <span>Instant Delivery Fee</span>
+            <span class="text-emerald-400 font-bold">FREE ⚡</span>
+        </div>
+        <div class="flex justify-between items-center text-xl font-black text-white pt-2 border-t border-slate-800">
+            <span>Grand Total</span>
+            <span id="cart-total">₹0</span>
+        </div>
+
+        <form id="checkout-form" onsubmit="handleCheckout(event)" class="space-y-3 pt-2">
+            <input type="text" id="chk-name" required placeholder="Your Full Name (e.g. Shorya)" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white outline-none focus:border-indigo-500">
+            <input type="text" id="chk-address" required placeholder="Hostel / Room / Delivery Address" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white outline-none focus:border-indigo-500">
+            <select id="chk-payment" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white outline-none focus:border-indigo-500">
+                <option value="UPI / ZapPay Instant">UPI / ZapPay Instant ⚡</option>
+                <option value="Credit / Debit Card">Credit / Debit Card</option>
+                <option value="Cash on Delivery (COD)">Cash on Delivery (COD)</option>
+            </select>
+            <button type="submit" id="btn-checkout" class="w-full gradient-btn text-white font-extrabold py-3.5 rounded-xl shadow-lg shadow-indigo-500/30 transition flex items-center justify-center">
+                <i class="fa-solid fa-lock mr-2"></i> Place Instant Order
+            </button>
+        </form>
+    </div>
+</aside>
 
 <!-- Main Content -->
 <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-    <!-- ================= DAY 8: AUTH SCREEN ================= -->
+    <!-- ================= AUTH SCREEN ================= -->
     <section id="view-auth" class="hidden max-w-md mx-auto glass p-8 rounded-3xl shadow-2xl mt-6">
         <div class="text-center mb-6">
             <h2 class="text-2xl font-extrabold text-white">Welcome to ZapKart ⚡</h2>
             <p class="text-xs text-slate-400 mt-1">Sign in or create an account to manage products</p>
         </div>
-
         <div class="flex bg-slate-900/90 p-1 rounded-2xl mb-6 border border-slate-800">
             <button id="tab-login" onclick="switchAuthTab('login')" class="w-1/2 py-2.5 rounded-xl text-sm font-bold gradient-btn text-white shadow">Login</button>
             <button id="tab-signup" onclick="switchAuthTab('signup')" class="w-1/2 py-2.5 rounded-xl text-sm font-bold text-slate-400">Sign Up</button>
         </div>
-
-        <!-- Login Form -->
         <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
             <div>
                 <label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Email Address</label>
@@ -81,12 +132,8 @@
                 <label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Password</label>
                 <input type="password" id="login-password" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700 rounded-xl text-white focus:border-indigo-500 outline-none">
             </div>
-            <button type="submit" id="btn-login-submit" class="w-full gradient-btn text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-500/30 transition">
-                Sign In Now
-            </button>
+            <button type="submit" class="w-full gradient-btn text-white font-bold py-3.5 rounded-xl shadow-lg transition">Sign In Now</button>
         </form>
-
-        <!-- Signup Form -->
         <form id="form-signup" onsubmit="handleSignup(event)" class="space-y-4 hidden">
             <div>
                 <label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Full Name</label>
@@ -100,15 +147,12 @@
                 <label class="block text-xs font-bold uppercase text-slate-400 mb-1.5">Create Password</label>
                 <input type="password" id="signup-password" required placeholder="Minimum 6 characters" class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700 rounded-xl text-white focus:border-indigo-500 outline-none">
             </div>
-            <button type="submit" id="btn-signup-submit" class="w-full gradient-btn text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-500/30 transition">
-                Create Free Account
-            </button>
+            <button type="submit" class="w-full gradient-btn text-white font-bold py-3.5 rounded-xl shadow-lg transition">Create Free Account</button>
         </form>
     </section>
 
-    <!-- ================= DAY 9: STOREFRONT SCREEN ================= -->
+    <!-- ================= STOREFRONT SCREEN ================= -->
     <section id="view-store">
-        <!-- Hero Banner -->
         <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-900/90 via-purple-900/80 to-slate-900 border border-indigo-500/30 p-7 sm:p-10 mb-8 shadow-2xl">
             <div class="relative z-10 max-w-2xl">
                     <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 mb-3">
@@ -118,7 +162,7 @@
                     Next-Gen Shopping, <span class="gradient-text">Delivered in Minutes.</span>
                 </h1>
                 <p class="text-slate-300 mt-3 text-sm sm:text-base">
-                    From flagship gadgets & RGB gaming gear to chilled midnight coffee — powered live by your FastAPI + SQLAlchemy engine.
+                    Add items to your Express Cart, checkout in one click, and watch live inventory update automatically!
                 </p>
             </div>
             <i class="fa-solid fa-bolt-lightning text-[160px] text-indigo-500/10 absolute -right-4 -bottom-6"></i>
@@ -131,25 +175,18 @@
                 <input type="text" id="search-input" oninput="loadProducts()" placeholder="Search iPhone, Sony, Keyboard, Coffee..."
                        class="w-full pl-11 pr-4 py-3 bg-slate-900/90 border border-slate-700/80 rounded-2xl text-sm text-white placeholder-slate-400 focus:border-indigo-500 outline-none shadow-inner">
             </div>
-
-            <div id="category-Bar" class="flex gap-2.5 overflow-x-auto w-full md:w-auto pb-1">
-                <!-- Dynamic Category Pills -->
-            </div>
+            <div id="category-Bar" class="flex gap-2.5 overflow-x-auto w-full md:w-auto pb-1"></div>
         </div>
 
-        <!-- Loading State -->
         <div id="loading-spinner" class="text-center py-16 hidden">
             <i class="fa-solid fa-bolt fa-bounce text-4xl text-indigo-400"></i>
-            <p class="text-slate-400 text-sm mt-3 font-medium">Fetching live inventory from FastAPI...</p>
+            <p class="text-slate-400 text-sm mt-3 font-medium">Fetching live inventory...</p>
         </div>
 
-        <!-- Products Grid -->
-        <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Dynamic Cards -->
-        </div>
+        <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
     </section>
 
-    <!-- ================= DAY 9: PRODUCT DETAIL SCREEN ================= -->
+    <!-- ================= PRODUCT DETAIL SCREEN ================= -->
     <section id="view-detail" class="hidden max-w-4xl mx-auto glass rounded-3xl p-6 sm:p-10 mt-4 shadow-2xl">
         <button onclick="navigate('store')" class="text-sm font-semibold text-indigo-400 hover:text-indigo-300 mb-6 inline-flex items-center">
             <i class="fa-solid fa-arrow-left mr-2"></i> Back to Storefront
@@ -157,9 +194,23 @@
         <div id="detail-content"></div>
     </section>
 
+    <!-- ================= DAY 12: MY ORDERS HISTORY SCREEN ================= -->
+    <section id="view-orders" class="hidden max-w-4xl mx-auto">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-3xl font-extrabold text-white">Order History 🧾</h2>
+                <p class="text-slate-400 text-sm mt-1">Live orders processed via your Checkout Engine</p>
+            </div>
+            <button onclick="navigate('store')" class="bg-slate-800 hover:bg-slate-700 px-4 py-2.5 rounded-xl text-sm font-bold text-white">
+                + Shop More
+            </button>
+        </div>
+        <div id="orders-list" class="space-y-4"></div>
+    </section>
+
 </main>
 
-<!-- ================= DAY 10: ADD / EDIT PRODUCT MODAL ================= -->
+<!-- ================= ADD / EDIT PRODUCT MODAL ================= -->
 <div id="product-modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
     <div class="glass rounded-3xl max-w-md w-full p-7 shadow-2xl border border-slate-700">
         <div class="flex justify-between items-center border-b border-slate-800 pb-4 mb-5">
@@ -170,7 +221,7 @@
             <input type="hidden" id="prod-id">
             <div>
                 <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Product Title</label>
-                <input type="text" id="prod-name" required placeholder="e.g., MacBook Air M3 / Monster Energy" class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white outline-none focus:border-indigo-500">
+                <input type="text" id="prod-name" required placeholder="e.g., MacBook Air M3" class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white outline-none focus:border-indigo-500">
             </div>
             <div>
                 <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Image URL (Optional)</label>
@@ -178,7 +229,7 @@
             </div>
             <div>
                 <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Description</label>
-                <textarea id="prod-desc" rows="2" placeholder="Highlight key specs or details..." class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white outline-none focus:border-indigo-500 text-sm"></textarea>
+                <textarea id="prod-desc" rows="2" placeholder="Highlight key specs..." class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white outline-none focus:border-indigo-500 text-sm"></textarea>
             </div>
             <div class="grid grid-cols-2 gap-3">
                 <div>
@@ -194,9 +245,7 @@
                 <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Category</label>
                 <select id="prod-category" required class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white outline-none focus:border-indigo-500"></select>
             </div>
-            <button type="submit" class="w-full gradient-btn text-white font-bold py-3 rounded-xl shadow-lg transition mt-2">
-                Save to Storefront
-            </button>
+            <button type="submit" class="w-full gradient-btn text-white font-bold py-3 rounded-xl shadow-lg transition mt-2">Save to Storefront</button>
         </form>
     </div>
 </div>
@@ -217,9 +266,7 @@
                 <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Description</label>
                 <input type="text" id="cat-desc" placeholder="Short category summary" class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white outline-none focus:border-indigo-500">
             </div>
-            <button type="submit" class="w-full gradient-btn text-white font-bold py-3 rounded-xl shadow-lg transition">
-                Add Category
-            </button>
+            <button type="submit" class="w-full gradient-btn text-white font-bold py-3 rounded-xl shadow-lg transition">Add Category</button>
         </form>
     </div>
 </div>
@@ -251,9 +298,10 @@
     }
 
     function navigate(view) {
-        ["store", "auth", "detail"].forEach(v => document.getElementById(`view-${v}`).classList.add("hidden"));
+        ["store", "auth", "detail", "orders"].forEach(v => document.getElementById(`view-${v}`).classList.add("hidden"));
         document.getElementById(`view-${view}`).classList.remove("hidden");
         if (view === "store") loadProducts();
+        if (view === "orders") loadOrders();
     }
 
     function switchAuthTab(tab) {
@@ -307,6 +355,167 @@
         }
     }
 
+    // ==================== DAY 12: CART & CHECKOUT INTEGRATION ====================
+    function toggleCartDrawer(open) {
+        const overlay = document.getElementById("cart-overlay");
+        const drawer = document.getElementById("cart-drawer");
+        if (open) {
+            overlay.classList.remove("hidden");
+            drawer.classList.remove("translate-x-full");
+            loadCart();
+        } else {
+            overlay.classList.add("hidden");
+            drawer.classList.add("translate-x-full");
+        }
+    }
+
+    async function addToCart(productId, productName) {
+        try {
+            const res = await fetch(`${API_BASE}/api/cart`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ product_id: productId, quantity: 1 })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.detail || "Could not add to cart");
+            showToast(`⚡ ${productName} added to Cart!`);
+            await loadCart();
+        } catch (err) {
+            showToast(err.message, true);
+        }
+    }
+
+    async function removeFromCart(itemId) {
+        try {
+            const res = await fetch(`${API_BASE}/api/cart/${itemId}`, { method: "DELETE" });
+            if (!res.ok) throw new Error("Failed to remove item");
+            await loadCart();
+        } catch (err) {
+            showToast(err.message, true);
+        }
+    }
+
+    async function loadCart() {
+        try {
+            const res = await fetch(`${API_BASE}/api/cart`);
+            const items = await res.json();
+            const container = document.getElementById("cart-items-container");
+            const badge = document.getElementById("cart-badge");
+            const totalEl = document.getElementById("cart-total");
+
+            let count = 0;
+            let total = 0;
+
+            if (items.length === 0) {
+                badge.innerText = "0";
+                totalEl.innerText = "₹0";
+                container.innerHTML = `
+                    <div class="text-center py-16">
+                        <i class="fa-solid fa-cart-arrow-down text-5xl text-slate-700 mb-3"></i>
+                        <p class="text-slate-400 font-semibold">Your ZapKart bag is empty!</p>
+                        <p class="text-slate-500 text-xs mt-1">Add gadgets or snacks to checkout in 12 mins.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = "";
+            items.forEach(item => {
+                const p = unpackProduct(item.product);
+                count += item.quantity;
+                total += p.price * item.quantity;
+
+                container.innerHTML += `
+                    <div class="flex items-center justify-between bg-slate-900 border border-slate-800 p-3.5 rounded-2xl">
+                        <div class="flex items-center space-x-3">
+                            <img src="${p.imageUrl}" class="w-14 h-14 rounded-xl object-cover bg-slate-800">
+                            <div>
+                                <h4 class="font-bold text-white text-sm line-clamp-1">${p.name}</h4>
+                                <p class="text-xs text-indigo-400 font-bold mt-0.5">₹${p.price.toLocaleString('en-IN')} × ${item.quantity}</p>
+                            </div>
+                        </div>
+                        <button onclick="removeFromCart(${item.id})" class="text-rose-400 hover:bg-rose-500/20 p-2 rounded-xl transition">
+                            <i class="fa-solid fa-trash text-sm"></i>
+                        </button>
+                    </div>
+                `;
+            });
+
+            badge.innerText = count;
+            totalEl.innerText = "₹" + total.toLocaleString('en-IN');
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    async function handleCheckout(e) {
+        e.preventDefault();
+        const btn = document.getElementById("btn-checkout");
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Processing Payment...`;
+        btn.disabled = true;
+
+        try {
+            const res = await fetch(`${API_BASE}/api/orders/checkout`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    customer_name: document.getElementById("chk-name").value,
+                    delivery_address: document.getElementById("chk-address").value,
+                    payment_method: document.getElementById("chk-payment").value
+                })
+            });
+            const order = await res.json();
+            if (!res.ok) throw new Error(order.detail || "Checkout failed");
+
+            showToast(`🎉 Order #${order.id} Confirmed! Stock Updated.`);
+            document.getElementById("checkout-form").reset();
+            toggleCartDrawer(false);
+            await loadCart();
+            navigate("orders");
+        } catch (err) {
+            showToast(err.message, true);
+        } finally {
+            btn.innerHTML = `<i class="fa-solid fa-lock mr-2"></i> Place Instant Order`;
+            btn.disabled = false;
+        }
+    }
+
+    async function loadOrders() {
+        const list = document.getElementById("orders-list");
+        list.innerHTML = `<p class="text-slate-400 text-sm">Loading orders...</p>`;
+        try {
+            const res = await fetch(`${API_BASE}/api/orders`);
+            const orders = await res.json();
+            if (orders.length === 0) {
+                list.innerHTML = `<div class="glass p-10 rounded-3xl text-center text-slate-400">No orders placed yet. Add items to your cart and place your first order!</div>`;
+                return;
+            }
+            list.innerHTML = "";
+            orders.forEach(o => {
+                list.innerHTML += `
+                    <div class="glass p-6 rounded-3xl border border-slate-800 flex flex-col sm:flex-row justify-between gap-4">
+                        <div>
+                            <div class="flex items-center space-x-2.5">
+                                <span class="bg-indigo-500/20 text-indigo-300 text-xs font-black px-3 py-1 rounded-full">ORDER #${o.id}</span>
+                                <span class="bg-emerald-500/20 text-emerald-400 text-xs font-bold px-3 py-1 rounded-full">${o.status}</span>
+                            </div>
+                            <h3 class="text-white font-bold text-base mt-3">${o.items_summary}</h3>
+                            <p class="text-slate-400 text-xs mt-1.5"><i class="fa-solid fa-location-dot mr-1 text-indigo-400"></i> ${o.customer_name} • ${o.delivery_address}</p>
+                            <p class="text-slate-500 text-xs mt-0.5"><i class="fa-solid fa-wallet mr-1"></i> Paid via ${o.payment_method}</p>
+                        </div>
+                        <div class="sm:text-right flex sm:flex-col justify-between items-end">
+                            <span class="text-2xl font-black text-white">₹${o.total_amount.toLocaleString('en-IN')}</span>
+                            <span class="text-[11px] text-emerald-400 font-bold">Stock Deducted ✓</span>
+                        </div>
+                    </div>
+                `;
+            });
+        } catch (err) {
+            showToast("Could not load orders", true);
+        }
+    }
+
+    // ==================== CATEGORIES & PRODUCTS ====================
     async function loadCategories() {
         const res = await fetch(`${API_BASE}/api/categories`);
         categories = await res.json();
@@ -354,6 +563,7 @@
                 const catObj = categories.find(c => c.id === p.category_id);
                 const catName = catObj ? catObj.name : "Store Item";
                 const encodedP = encodeURIComponent(JSON.stringify(p));
+                const safeName = p.name.replace(/'/g, "\\'");
 
                 grid.innerHTML += `
                     <div class="glass rounded-3xl p-4 card-glow transition-all duration-300 flex flex-col justify-between">
@@ -366,16 +576,20 @@
                             <h3 onclick="openProductDetail(${p.id})" class="font-extrabold text-white text-base hover:text-indigo-400 cursor-pointer line-clamp-1">${p.name}</h3>
                             <p class="text-slate-400 text-xs mt-1 line-clamp-2">${p.cleanDesc || 'Premium quality assured.'}</p>
                         </div>
-                        <div class="mt-5 pt-3.5 border-t border-slate-800/80 flex items-center justify-between">
-                            <div>
-                                <span class="text-xl font-black text-white">₹${p.price.toLocaleString('en-IN')}</span>
-                                <span class="block text-[10px] text-emerald-400 font-bold">${p.stock > 0 ? p.stock + ' units left' : 'Out of Stock'}</span>
+                        <div class="mt-4 pt-3.5 border-t border-slate-800/80">
+                            <div class="flex items-center justify-between mb-3">
+                                <div>
+                                    <span class="text-xl font-black text-white">₹${p.price.toLocaleString('en-IN')}</span>
+                                    <span class="block text-[10px] ${p.stock > 0 ? 'text-emerald-400' : 'text-rose-400'} font-bold">${p.stock > 0 ? p.stock + ' units left' : 'Out of Stock'}</span>
+                                </div>
+                                <div class="flex space-x-1">
+                                    <button onclick="openEditModal('${encodedP}')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-lg text-xs"><i class="fa-solid fa-pen"></i></button>
+                                    <button onclick="handleDeleteProduct(${p.id})" class="bg-rose-500/15 hover:bg-rose-500/30 text-rose-400 p-2 rounded-lg text-xs"><i class="fa-solid fa-trash"></i></button>
+                                </div>
                             </div>
-                            <div class="flex space-x-1.5">
-                                <button onclick="openProductDetail(${p.id})" class="gradient-btn text-white px-3 py-2 rounded-xl text-xs font-bold shadow">View</button>
-                                <button onclick="openEditModal('${encodedP}')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-2 rounded-xl text-xs"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="handleDeleteProduct(${p.id})" class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 px-2.5 py-2 rounded-xl text-xs"><i class="fa-solid fa-trash"></i></button>
-                            </div>
+                            <button onclick="addToCart(${p.id}, '${safeName}')" ${p.stock <= 0 ? 'disabled' : ''} class="w-full ${p.stock > 0 ? 'gradient-btn text-white shadow-md shadow-indigo-500/20' : 'bg-slate-800 text-slate-500 cursor-not-allowed'} py-2.5 rounded-xl text-xs font-extrabold tracking-wide transition flex items-center justify-center">
+                                <i class="fa-solid fa-cart-plus mr-1.5"></i> ${p.stock > 0 ? 'ADD TO CART' : 'SOLD OUT'}
+                            </button>
                         </div>
                     </div>
                 `;
@@ -394,6 +608,7 @@
             const p = unpackProduct(await res.json());
             const catObj = categories.find(c => c.id === p.category_id);
             const encodedP = encodeURIComponent(JSON.stringify(p));
+            const safeName = p.name.replace(/'/g, "\\'");
 
             document.getElementById("detail-content").innerHTML = `
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
@@ -405,11 +620,11 @@
                         <h2 class="text-3xl font-extrabold text-white mt-3">${p.name}</h2>
                         <p class="text-slate-300 mt-3 text-sm leading-relaxed">${p.cleanDesc}</p>
                         <div class="text-4xl font-black text-white mt-5">₹${p.price.toLocaleString('en-IN')}</div>
-                        <p class="text-xs text-emerald-400 font-bold mt-1">⚡ In Stock (${p.stock} units available for instant dispatch)</p>
+                        <p class="text-xs text-emerald-400 font-bold mt-1">⚡ In Stock (${p.stock} units available)</p>
                         <div class="mt-7 flex flex-wrap gap-3">
-                            <button onclick="showToast('Added ${p.name} to Express Cart! ⚡')" class="gradient-btn text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg"><i class="fa-solid fa-bag-shopping mr-2"></i>Buy Now</button>
-                            <button onclick="openEditModal('${encodedP}')" class="bg-slate-800 hover:bg-slate-700 text-white px-5 py-3 rounded-xl text-sm font-bold"><i class="fa-solid fa-pen mr-1.5"></i>Edit</button>
-                            <button onclick="handleDeleteProduct(${p.id})" class="bg-rose-600/20 border border-rose-500/40 text-rose-400 px-5 py-3 rounded-xl text-sm font-bold"><i class="fa-solid fa-trash mr-1.5"></i>Delete</button>
+                            <button onclick="addToCart(${p.id}, '${safeName}')" class="gradient-btn text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg"><i class="fa-solid fa-cart-plus mr-2"></i>Add to Express Cart</button>
+                            <button onclick="openEditModal('${encodedP}')" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-3 rounded-xl text-sm font-bold"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="handleDeleteProduct(${p.id})" class="bg-rose-600/20 border border-rose-500/40 text-rose-400 px-4 py-3 rounded-xl text-sm font-bold"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
                 </div>
@@ -440,9 +655,7 @@
         document.getElementById("product-modal").classList.remove("hidden");
     }
 
-    function closeProductModal() {
-        document.getElementById("product-modal").classList.add("hidden");
-    }
+    function closeProductModal() { document.getElementById("product-modal").classList.add("hidden"); }
 
     async function handleSaveProduct(e) {
         e.preventDefault();
@@ -470,7 +683,7 @@
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.detail || "Failed to save");
-            showToast(id ? "Product updated!" : "New product added to ZapKart!");
+            showToast(id ? "Product updated!" : "New product added!");
             closeProductModal();
             navigate("store");
         } catch (err) {
@@ -514,12 +727,12 @@
         }
     }
 
-    // Auto-seed demo products on first load & display storefront
     window.onload = async () => {
         if (currentUserToken) document.getElementById("auth-btn-text").innerText = "Member ✓";
         await fetch(`${API_BASE}/api/seed`, { method: "POST" });
         await loadCategories();
         await loadProducts();
+        await loadCart();
     };
 </script>
 </body>
