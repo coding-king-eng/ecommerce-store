@@ -18,6 +18,13 @@ from pathlib import Path
 from fastapi.responses import FileResponse
 from pathlib import Path
 from schemas import UserCreate, UserResponse, UserLogin, Token, CategoryCreate, CategoryResponse, ProductCreate, ProductResponse, ProductUpdate
+from models import Base, User, Category, Product, CartItem, Order
+from schemas import (
+    UserCreate, UserResponse, UserLogin, Token,
+    CategoryCreate, CategoryResponse,
+    ProductCreate, ProductResponse, ProductUpdate,
+    CartItemCreate, CartItemResponse, CheckoutRequest, OrderResponse
+)
 
 
 Base.metadata.create_all(bind=engine)
@@ -261,3 +268,84 @@ def seed_demo_data(db: Session = Depends(get_db)):
         db.commit()
 
     return {"message": "Store stocked with products!"}
+# ==================== DAY 11: HEAVY FEATURE (CART & CHECKOUT ENGINE) ====================
+
+@app.get("/api/cart", response_model=list[CartItemResponse])
+def get_cart(db: Session = Depends(get_db)):
+    return db.query(CartItem).all()
+
+
+@app.post("/api/cart", response_model=CartItemResponse, status_code=status.HTTP_201_CREATED)
+def add_to_cart(item_data: CartItemCreate, db: Session = Depends(get_db)):
+    product = db.query(Product).filter(Product.id == item_data.product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    if product.stock < item_data.quantity:
+        raise HTTPException(status_code=400, detail="Not enough stock available")
+
+    existing_item = db.query(CartItem).filter(CartItem.product_id == item_data.product_id).first()
+    if existing_item:
+        existing_item.quantity += item_data.quantity
+        db.commit()
+        db.refresh(existing_item)
+        return existing_item
+
+    new_item = CartItem(product_id=item_data.product_id, quantity=item_data.quantity)
+    db.add(new_item)
+    db.commit()
+    db.refresh(new_item)
+    return new_item
+
+
+@app.delete("/api/cart/{item_id}")
+def remove_from_cart(item_id: int, db: Session = Depends(get_db)):
+    item = db.query(CartItem).filter(CartItem.id == item_id).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Cart item not found")
+    db.delete(item)
+    db.commit()
+    return {"message": "Item removed from cart"}
+
+
+@app.post("/api/orders/checkout", response_model=OrderResponse, status_code=status.HTTP_201_CREATED)
+def process_checkout(checkout_data: CheckoutRequest, db: Session = Depends(get_db)):
+    cart_items = db.query(CartItem).all()
+    if not cart_items:
+        raise HTTPException(status_code=400, detail="Your cart is empty!")
+
+    total_amount = 0.0
+    summary_parts = []
+
+    for item in cart_items:
+        product = db.query(Product).filter(Product.id == item.product_id).first()
+        if not product or product.stock < item.quantity:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Insufficient stock for {product.name if product else 'item'}"
+            )
+        # Deduct live inventory stock
+        product.stock -= item.quantity
+        line_total = product.price * item.quantity
+        total_amount += line_total
+        summary_parts.append(f"{product.name} (x{item.quantity})")
+
+    new_order = Order(
+        customer_name=checkout_data.customer_name,
+        delivery_address=checkout_data.delivery_address,
+        payment_method=checkout_data.payment_method,
+        total_amount=round(total_amount, 2),
+        items_summary=", ".join(summary_parts),
+        status="Confirmed ⚡ Dispatched in 12 Mins"
+    )
+    db.add(new_order)
+
+    # Clear cart after successful order
+    db.query(CartItem).delete()
+    db.commit()
+    db.refresh(new_order)
+    return new_order
+
+
+@app.get("/api/orders", response_model=list[OrderResponse])
+def get_orders(db: Session = Depends(get_db)):
+    return db.query(Order).order_by(Order.id.desc()).all()

@@ -62,3 +62,34 @@ class ProductUpdate(BaseModel):
     stock: int | None = None
     category_id: int | None = None
     image_url: str | None = None
+class CartItemCreate(BaseModel):
+    product_id: int
+    quantity: int = 1
+
+class CartItemResponse(BaseModel):
+    id: int
+    product_id: int
+    quantity: int
+    product: ProductResponse
+
+    class Config:
+        from_attributes = True
+        orm_mode = True
+
+class CheckoutRequest(BaseModel):
+    customer_name: str
+    delivery_address: str
+    payment_method: str = "UPI / ZapPay"
+
+class OrderResponse(BaseModel):
+    id: int
+    customer_name: str
+    delivery_address: str
+    payment_method: str
+    total_amount: float
+    items_summary: str
+    status: str
+
+    class Config:
+        from_attributes = True
+        orm_mode = True
